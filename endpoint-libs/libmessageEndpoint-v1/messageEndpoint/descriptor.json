@@ -1,13 +1,13 @@
 {
   "files": [
     {
-      "downloadUrl": "/downloads/messageEndpoint/v1/20150218174830/java/1.18.0-rc/example.com-messageEndpoint-v1-20150218174830-java-1.18.0-rc-sources.jar", 
-      "path": "example.com-messageEndpoint-v1-20150218174830-java-1.18.0-rc-sources.jar", 
+      "downloadUrl": "/downloads/messageEndpoint/v1/20150304004113/java/1.18.0-rc/example.com-messageEndpoint-v1-20150304004113-java-1.18.0-rc-sources.jar", 
+      "path": "example.com-messageEndpoint-v1-20150304004113-java-1.18.0-rc-sources.jar", 
       "type": "source", 
-      "timestamp": "2015-02-18 17:48"
+      "timestamp": "2015-03-04 00:41"
     }, 
     {
-      "path": "example.com-messageEndpoint-v1-20150218174830-java-1.18.0-rc.jar.properties", 
+      "path": "example.com-messageEndpoint-v1-20150304004113-java-1.18.0-rc.jar.properties", 
       "type": "android.properties"
     }
   ], 
@@ -675,5 +675,5 @@
   "packagePath": "shoppinglist", 
   "language_version": "1.18.0-rc", 
   "id": "messageEndpoint:v1", 
-  "revision": 20150218174830
+  "revision": 20150304004113
 }

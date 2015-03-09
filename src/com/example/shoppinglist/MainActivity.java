@@ -1,6 +1,7 @@
 package com.example.shoppinglist;
 
 import java.io.IOException;
+
 import java.util.Random;
 
 import com.example.shoppinglist.deviceinfoendpoint.Deviceinfoendpoint;
@@ -9,10 +10,12 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.json.jackson2.JacksonFactory;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +23,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import android.provider.Settings.Secure;
 public class MainActivity extends Activity {
 
 	@Override
@@ -28,22 +31,32 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 	    Button button = (Button) findViewById(R.id.button1);
-		button.setOnClickListener(new OnClickListener(){
+	    
+	    button.setOnClickListener(new OnClickListener(){
+			
+		private String android_id = Secure.getString(getBaseContext().getContentResolver(),Secure.ANDROID_ID); 
+		
 		@Override
 		public void onClick(View v) {
-		    // TODO Auto-generated method stub
-			Random rand = new Random();
-
-		    // nextInt is normally exclusive of the top value,
-		    // so add 1 to make it inclusive
-		    int randomNum = rand.nextInt(1000);
-				String Device_ID=Integer.toString(randomNum);
+			BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
+		    String mydeviceaddress="";
+		    if (bluetooth.isEnabled()) {
+			    mydeviceaddress = bluetooth.getAddress();
+			}
+			else
+			{
+				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(enableBtIntent, 1);
+				mydeviceaddress = bluetooth.getAddress();
+			}
+				String Device_ID=mydeviceaddress;  //replace with Integer.toString(randomNum);
 				String product=null;
 		        final EditText products = (EditText) findViewById(R.id.editText1);
 		        Bundle bundle = new Bundle();
 		        product= products.getText().toString();
 		        bundle.putString("products", products.getText().toString());
 		        new CreateDeviceInfo().execute(Device_ID,product);
+		        new UpdateDeviceInfo().execute(Device_ID,product);
 				Context context=getApplicationContext();
 				Toast.makeText(context, "Shopping History Updated", Toast.LENGTH_SHORT).show();
 			}
@@ -98,5 +111,31 @@ public class MainActivity extends Activity {
           }
           return null;
         }
+	}
+	private class UpdateDeviceInfo extends AsyncTask<String, Void, Void> {
+		@Override
+        protected Void doInBackground(String... params) {
+          DeviceInfo deviceinfo = new com.example.shoppinglist.deviceinfoendpoint.model.DeviceInfo();
+          
+          // Set the ID of the store where the user is.
+          deviceinfo.setDeviceRegistrationID(params[0]);
+          deviceinfo.setDeviceInformation(params[1]);
+          Deviceinfoendpoint.Builder builder = new Deviceinfoendpoint.Builder(
+              AndroidHttp.newCompatibleTransport(), new JacksonFactory(), null);
+
+          builder = CloudEndpointUtils.updateBuilder(builder);
+
+          Deviceinfoendpoint endpoint = builder.build();
+
+
+          try {
+        	  endpoint.updateDeviceInfo(deviceinfo).execute();
+          } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+          return null;
+        }
+			
     }
 }
